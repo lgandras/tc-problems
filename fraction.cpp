@@ -3,10 +3,12 @@
 
 template <typename T>
 class Fraction {
-  void simplify() {
-    T a = this->num, b = this->den;
+  void normalize() {
+    this->num = this->num * (this->den < 0 ? -1 : 1);
+    this->den = this->den * (this->den < 0 ? -1 : 1);
+    T a = this->num * (this->num < 0 ? -1 : 1), b = this->den;
     T ma = std::max(a, b), mi = std::min(a, b);
-    while (mi < ma) {
+    while (0 < mi) {
       a = ma - mi;
       b = mi;
       ma = std::max(a, b);
@@ -17,10 +19,29 @@ class Fraction {
   }
   public:
     T num, den;
-    Fraction(T num, T den = 1) {
+    Fraction(T num = 0, T den = 1) {
       this->num = num;
       this->den = den;
-      this->simplify();
+      this->normalize();
+    }
+    Fraction<T> operator*(const Fraction<T>& f) const {
+      return Fraction<T>(this->num * f.num, this->den * f.den);
+    }
+    Fraction<T> operator-(const Fraction<T>& f) const {
+      return Fraction<T>(this->num * f.den - f.num * this->den, this->den * f.den);
+    }
+    Fraction<T> operator/(const Fraction<T>& f) const {
+      return Fraction<T>(this->num * f.den, this->den * f.num);
+    }
+    Fraction<T> operator+=(const Fraction<T>& f) {
+      this->num = this->num * f.den + f.num * this->den;
+      this->den = this->den * f.den;
+      this->normalize();
+    }
+    Fraction<T> operator-=(const Fraction<T>& f) {
+      this->num = this->num * f.den - f.num * this->den;
+      this->den = this->den * f.den;
+      this->normalize();
     }
 };
 template <typename T>
